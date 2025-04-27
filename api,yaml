@@ -1,0 +1,224 @@
+openapi: 3.0.0
+info:
+  title: Library API
+  description: API для управления книгами, авторами, арендой и пользователями.
+  version: 1.0.0
+servers:
+  - url: https://api.library.com/v1
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "1984"
+        author_id:
+          type: integer
+          example: 10
+        category_id:
+          type: integer
+          example: 3
+        isbn:
+          type: string
+          example: "978-0451524935"
+        available_copies:
+          type: integer
+          example: 5
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "john_doe"
+        email:
+          type: string
+          example: "john@example.com"
+        is_verified:
+          type: boolean
+          example: false
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Bad Request"
+        message:
+          type: string
+          example: "Invalid request data."
+  parameters:
+    page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 10
+paths:
+  /books:
+    get:
+      tags:
+        - Books
+      summary: Список книг
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+        - name: author_id
+          in: query
+          schema:
+            type: integer
+        - name: category_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Успешный ответ
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: "public, max-age=300"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+  /auth/register:
+    post:
+      tags:
+        - Users
+      summary: Регистрация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              example:
+                username: "john_doe"
+                email: "john@example.com"
+                password: "secure123"
+      responses:
+        201:
+          description: Пользователь создан
+        400:
+          description: Неверные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /rentals:
+    post:
+      tags:
+        - Rentals
+      summary: Бронирование книги
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                book_id:
+                  type: integer
+                user_id:
+                  type: integer
+              example:
+                book_id: 5
+                user_id: 10
+      responses:
+        201:
+          description: Книга забронирована
+        400:
+          description: Нет доступных копий книги
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+                example:
+                  error: "No available copies"
+                  message: "No available copies for book ID 5"
+        403:
+          description: Email не подтвержден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+                example:
+                  error: "Forbidden"
+                  message: "Email not verified. Check your inbox."
+  /auth/confirm-email:
+    post:
+      tags:
+        - Users
+      summary: Подтверждение email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                code:
+                  type: string
+              example:
+                email: "john@example.com"
+                code: "ABCD123"
+      responses:
+        200:
+          description: Email подтвержден
+        400:
+          description: Неверный код
+security:
+  - BearerAuth: []
