@@ -276,7 +276,7 @@ GET /books?available=true&category_id=3
 
 ```
 POST /auth/verify-email
-Body: { "email": "john@example.com" }
+Body: { "email": "mashas12@example.com" }
 ```
 
 ### **Интеграция с текущими эндпоинтами**
@@ -302,7 +302,7 @@ Body: { "email": "john@example.com" }
 **Тело письма**:
 
 ```
-Здравствуйте, john_doe!
+Здравствуйте, Masha!
 Для завершения регистрации введите код: ABCD123
 Или перейдите по ссылке: https://api.library/confirm-email?token=xyz123
 ```
