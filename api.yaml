@@ -41,10 +41,10 @@ components:
           example: 1
         username:
           type: string
-          example: "john_doe"
+          example: "viva_andreev"
         email:
           type: string
-          example: "john@example.com"
+          example: "andreev12@example.com"
         is_verified:
           type: boolean
           example: false
@@ -132,8 +132,8 @@ paths:
                 password:
                   type: string
               example:
-                username: "john_doe"
-                email: "john@example.com"
+                username: "viva_andreev"
+                email: "andreev12@example.com"
                 password: "secure123"
       responses:
         201:
@@ -213,7 +213,7 @@ paths:
                 code:
                   type: string
               example:
-                email: "john@example.com"
+                email: "andreev12@example.com"
                 code: "ABCD123"
       responses:
         200:
